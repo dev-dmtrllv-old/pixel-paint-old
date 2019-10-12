@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>paint</title>
+		<style>
+			html,
+			body {
+				width: 100vw;
+				height: 100vh;
+				padding: 0px;
+				margin: 0px;
+				background: white;
+			}
+
+			body {
+				box-sizing: border-box;
+				padding: 35px;
+			}
+
+			.row {
+				height: 42px;
+				position: relative;
+			}
+
+			.pixel {
+				width: 42px;
+				height: 100%;
+				box-sizing: border-box;
+				border: 1px solid rgba(0, 0, 0, 0.35);
+				float: left;
+			}
+
+			#colors {
+				margin-top: 64px;
+			}
+
+			#colors input {
+				display: inline-block;
+				width: 64px;
+			}
+		</style>
+	</head>
+	<body>
+		<div id="canvas"></div>
+
+		<div id="colors">
+			r: <input type="number" min="0" max="255" value="0" placeholder="r" id="r" />
+			g: <input type="number" min="0" max="255" value="0" placeholder="g" id="g" />
+			b: <input type="number" min="0" max="255" value="0" placeholder="b" id="b" />
+		</div>
+	</body>
+	<script>
+		const canvas = document.getElementById("canvas");
+
+		let currentColor = `rgb(0, 0, 0)`;
+		let colors = {
+			r: 0,
+			g: 0,
+			b: 0
+		};
+
+		const inputs = Array.from(document.getElementById("colors").children);
+
+		const updateColor = (what, val) => {
+			colors[what] = val;
+			currentColor = `rgb(${colors.r}, ${colors.g}, ${colors.b})`;
+		};
+
+		inputs.forEach(i => i.onchange = e => {
+			updateColor(e.target.id, e.target.value);
+		});
+
+
+		let isMouseDown = false;
+
+
+		window.addEventListener("mousedown", () => isMouseDown = true);
+		window.addEventListener("mouseup", () => isMouseDown = false);
+
+		const setColor = (color) => currentColor = color;
+
+		const clickListener = (e) => { e.target.style.backgroundColor = currentColor; }
+
+		const mouseMoveListener = (e) => { if (isMouseDown) e.target.style.backgroundColor = currentColor; }
+
+		const createPixel = (size = 24) => {
+			const pixel = document.createElement("div")
+			pixel.className = "pixel";
+			pixel.style.width = `${size}px`;
+			pixel.addEventListener("click", clickListener);
+			pixel.addEventListener("mousemove", mouseMoveListener);
+			return pixel;
+		}
+
+		const createRow = (x = 16, size = 24) => {
+			let row = document.createElement("div");
+			row.className = "row";
+			row.style.height = `${size}px`;
+			for (let i = 0; i < x; i++)
+				row.appendChild(createPixel(size));
+			return row;
+		}
+
+		const createGrid = (width = 16, height = 16, size = 24) => {
+			canvas.innerHTML = null;
+			for (let i = 0; i < height; i++)
+				canvas.appendChild(createRow(width, size));
+		}
+
+		createGrid(16);
+	</script>
+</html>
